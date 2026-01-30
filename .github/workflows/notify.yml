@@ -1,0 +1,28 @@
+name: 6-hourly-it-news
+
+on:
+  schedule:
+    # UTC（世界標準時）で指定。0, 6, 12, 18時に実行（日本時間だと +9時間）
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # 手動でテスト実行するためのボタンを表示
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run script
+        env:
+          # Webhook URLを隠すためにSecrets（環境変数）を使うのが安全です
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: python main.py
